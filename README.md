@@ -61,12 +61,6 @@ gcc -o jogo *.c
 
 Este comando compilará todos os arquivos `.c` do projeto e gerará um executável chamado `jogo` (ou `jogo.exe` no Windows).
 
-**Comando de Compilação :**
-
-```bash
-gcc -o jogo *.c
-```
-
 #### Execução
 
   * **No Linux :**
