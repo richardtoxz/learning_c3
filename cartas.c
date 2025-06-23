@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <locale.h>
 #include "cartas.h"
 
 const char* tipo_para_string(TipoCarta tipo) {
@@ -14,12 +15,21 @@ const char* tipo_para_string(TipoCarta tipo) {
 
 void adicionar_carta_inicio(Carta **lista, TipoCarta tipo) {
     Carta *nova_carta = (Carta*) malloc(sizeof(Carta));
+    if (nova_carta == NULL) {
+        printf("Erro: Falha na alocação de memória!\n");
+        exit(EXIT_FAILURE);
+    }
     nova_carta->tipo = tipo;
     nova_carta->proximo = *lista;
     *lista = nova_carta;
 }
 
 Carta* criar_baralho(int tamanho_total) {
+    if (tamanho_total <= 0 || tamanho_total % 3 != 0) {
+        printf("Erro: Tamanho do baralho deve ser positivo e múltiplo de 3!\n");
+        return NULL;
+    }
+    
     Carta *baralho = NULL;
     int cartas_por_tipo = tamanho_total / 3;
     for (int i = 0; i < cartas_por_tipo; i++) {
@@ -31,30 +41,37 @@ Carta* criar_baralho(int tamanho_total) {
 }
 
 void embaralhar(Carta **lista) {
+    if (lista == NULL || *lista == NULL) return;
+    
     int n = contar_cartas(*lista);
-    if (n > 1) {
-        Carta **array_de_ponteiros = (Carta**) malloc(n * sizeof(Carta*));
-        Carta *atual = *lista;
-        for (int i = 0; i < n; i++) {
-            array_de_ponteiros[i] = atual;
-            atual = atual->proximo;
-        }
-
-        for (int i = 0; i < n - 1; i++) {
-            int j = i + rand() / (RAND_MAX / (n - i) + 1);
-            Carta *temp = array_de_ponteiros[j];
-            array_de_ponteiros[j] = array_de_ponteiros[i];
-            array_de_ponteiros[i] = temp;
-        }
-
-        *lista = array_de_ponteiros[0];
-        for (int i = 0; i < n - 1; i++) {
-            array_de_ponteiros[i]->proximo = array_de_ponteiros[i + 1];
-        }
-        array_de_ponteiros[n - 1]->proximo = NULL;
-
-        free(array_de_ponteiros);
+    if (n <= 1) return;
+    
+    Carta **array_de_ponteiros = (Carta**) malloc(n * sizeof(Carta*));
+    if (array_de_ponteiros == NULL) {
+        printf("Erro: Falha na alocação de memória para embaralhamento!\n");
+        return;
     }
+    
+    Carta *atual = *lista;
+    for (int i = 0; i < n; i++) {
+        array_de_ponteiros[i] = atual;
+        atual = atual->proximo;
+    }
+
+    for (int i = 0; i < n - 1; i++) {
+        int j = i + rand() / (RAND_MAX / (n - i) + 1);
+        Carta *temp = array_de_ponteiros[j];
+        array_de_ponteiros[j] = array_de_ponteiros[i];
+        array_de_ponteiros[i] = temp;
+    }
+
+    *lista = array_de_ponteiros[0];
+    for (int i = 0; i < n - 1; i++) {
+        array_de_ponteiros[i]->proximo = array_de_ponteiros[i + 1];
+    }
+    array_de_ponteiros[n - 1]->proximo = NULL;
+
+    free(array_de_ponteiros);
 }
 
 Carta* remover_carta_por_posicao(Carta **lista, int pos) {
@@ -83,7 +100,9 @@ Carta* remover_carta_por_posicao(Carta **lista, int pos) {
 }
 
 void comprar_carta(Carta **baralho, Carta **mao) {
-    if (*baralho == NULL) return;
+    if (baralho == NULL || mao == NULL || *baralho == NULL) {
+        return;
+    }
     Carta* carta_comprada = remover_carta_por_posicao(baralho, 1);
     if (carta_comprada != NULL) {
         carta_comprada->proximo = *mao;
@@ -102,6 +121,8 @@ int contar_cartas(Carta *lista) {
 }
 
 void liberar_lista(Carta **lista) {
+    if (lista == NULL) return;
+    
     Carta *atual = *lista;
     Carta *proximo;
     while (atual != NULL) {
@@ -114,17 +135,17 @@ void liberar_lista(Carta **lista) {
 
 void exibir_mao_formatada(Carta *mao) {
     Carta *atual = mao;
-    int i = 1;
-    char sigla;
+    int first = 1;
     while (atual != NULL) {
+        if (!first) printf(" ");
         switch(atual->tipo) {
-            case PEDRA: sigla = 'D'; break;
-            case PAPEL: sigla = 'P'; break;
-            case TESOURA: sigla = 'T'; break;
+            case PEDRA:   printf("pedra"); break;
+            case PAPEL:   printf("papel"); break;
+            case TESOURA: printf("tesoura"); break;
+            default:      printf("desconhecido"); break;
         }
-        printf("%c%d ", sigla, i);
+        first = 0;
         atual = atual->proximo;
-        i++;
     }
     printf("\n");
 }
