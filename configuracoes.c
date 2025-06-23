@@ -1,12 +1,17 @@
 #include <stdio.h>
+#include <locale.h>
 #include "configuracoes.h"
+#include "utils.h"
 
 void menu_configuracoes(Configuracoes *config) {
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+
     int opcao;
     int md_opcao;
     int novo_tamanho_baralho;
 
     do {
+        limpar_tela();
         printf("\n--- CONFIGURAÇÕES ---\n");
         printf("1. Definir Modo de Jogo (Atual: MD%d)\n", (config->pontos_para_vencer * 2) - 1);
         printf("2. Tamanho do Baralho (Atual: %d cartas)\n", config->tamanho_baralho);
@@ -14,6 +19,9 @@ void menu_configuracoes(Configuracoes *config) {
         printf("4. Voltar ao Menu Principal\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
+        
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
 
         switch (opcao) {
             case 1:
