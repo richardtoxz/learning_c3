@@ -16,7 +16,8 @@ void menu_configuracoes(Configuracoes *config) {
         printf("1. Definir Modo de Jogo (Atual: MD%d)\n", (config->pontos_para_vencer * 2) - 1);
         printf("2. Tamanho do Baralho (Atual: %d cartas)\n", config->tamanho_baralho);
         printf("3. Limite de Compra por Round (Atual: %s)\n", config->compra_limitada ? "Ativado" : "Desativado");
-        printf("4. Voltar ao Menu Principal\n");        printf("Escolha uma opção: ");
+        printf("4. Voltar ao Menu Principal\n");
+        printf("Escolha uma opção: ");
         scanf("%d", &opcao);
         
         int c;
